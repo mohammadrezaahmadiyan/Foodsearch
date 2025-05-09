@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📜 تاریخچه بازدیدها</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>📜 تاریخچه بازدیدهای شما</h2>
+
+        {% if history %}
+            <div class="recipe-grid">
+                {% for item in history %}
+                <div class="recipe-card">
+                    <img src="{{ item.recipe_image }}" alt="{{ item.recipe_name }}" class="recipe-image">
+                    <h3>{{ item.recipe_name }}</h3>
+                    <a href="{{ url_for('get_recipe_details', recipe_id=item.recipe_id) }}" class="btn">🔗 مشاهده مجدد</a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-results">📭 هنوز هیچ غذایی مشاهده نکرده‌اید.</p>
+        {% endif %}
+
+        <a href="/" class="btn">🏠 بازگشت به صفحه اصلی</a>
+    </div>
+</body>
+</html>

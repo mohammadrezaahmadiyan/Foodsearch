@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://unpkg.com/htmx.org@1.9.0"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>ورود به سیستم</h2>
+        <form method="POST" hx-post="{{ url_for('login') }}" hx-target="#login-message">
+            <input type="text" name="username" placeholder="نام کاربری" required>
+            <input type="password" name="password" placeholder="رمز عبور" required>
+            <button type="submit">ورود</button>
+        </form>
+        <div id="login-message">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        <p>حساب کاربری ندارید؟ <a href="{{ url_for('register') }}">ثبت‌نام کنید</a></p>
+    </div>
+
+
+
+<script>
+    document.body.addEventListener("htmx:afterRequest", function(event) {
+        let response = event.detail.xhr.responseText;
+        try {
+            let jsonResponse = JSON.parse(response);
+            if (jsonResponse.redirect) {
+                window.location.href = jsonResponse.redirect;
+            }
+        } catch (e) {
+            console.error("Invalid JSON response:", response);
+        }
+    });
+</script>
+
+<script>
+    window.addEventListener("pageshow", function(event) {
+        document.getElementById("login-message").innerHTML = "";
+    });
+</script>
+
+
+</body>
+</html>

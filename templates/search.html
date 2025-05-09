@@ -1,0 +1,7 @@
+{% for recipe in recipes %}
+    <div class="recipe">
+        <img src="{{ recipe.image }}" alt="{{ recipe.title }}">
+        <h2>{{ recipe.title }}</h2>
+        <button hx-post="/favorites" hx-vals='{"recipe_id": "{{ recipe.id }}", "title": "{{ recipe.title }}", "image": "{{ recipe.image }}"}' hx-swap="outerHTML">⭐ افزودن به علاقه‌مندی‌ها</button>
+    </div>
+{% endfor %}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ recipe.title }} | آشپزخانه من</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    {% if recipe %}
+    <div class="recipe-details-container">
+        <div class="recipe-header">
+            <h1>{{ recipe.title }}</h1>
+            <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="recipe-image">
+        </div>
+
+        <div class="recipe-info">
+            <p><i class="fas fa-clock"></i> <strong>زمان آماده‌سازی:</strong> {{ recipe.readyInMinutes }} دقیقه</p>
+            <p><i class="fas fa-utensils"></i> <strong>تعداد سرو:</strong> {{ recipe.servings }} نفر</p>
+        </div>
+        <div class="ingredients-box">
+            <h2 style="direction: rtl; text-align: right;"><i class="fas fa-carrot"></i> مواد اولیه</h2>
+            <ul>
+                {% for ingredient in recipe.extendedIngredients %}
+                    <li>{{ ingredient.original }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="recipe-instructions">
+            <h2 style="direction: rtl; text-align: right;"><i class="fas fa-book-open"></i> دستور پخت</h2>
+            <div class="instructions">{{ recipe.instructions | safe }}</div>
+        </div>
+
+        <div class="recipe-actions">
+            <i class="fas fa-heart {% if is_favorite %}favorite{% else %}not-favorite{% endif %}"
+               id="favorite-heart"
+               data-recipe-id="{{ recipe.id }}"
+               data-title="{{ recipe.title }}"
+               data-image="{{ recipe.image }}"></i>
+
+            <a href="/" class="btn back-btn"><i class="fas fa-home"></i> بازگشت به صفحه اصلی</a>
+        </div>
+    </div>
+    {% else %}
+    <p class="error"><i class="fas fa-exclamation-circle"></i> اطلاعاتی برای این غذا یافت نشد.</p>
+    {% endif %}
+
+    <script>
+    $(document).ready(function() {
+        $('#favorite-heart').click(function() {
+            const heart = $(this);
+            const recipeId = heart.data('recipe-id');
+            const title = heart.data('title');
+            const image = heart.data('image');
+
+            if (heart.hasClass('favorite')) {
+                // اگر قبلاً علاقه‌مندی بوده، حذف شود
+                $.ajax({
+                    url: '/remove_favorite/' + recipeId,
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            heart.removeClass('favorite').addClass('not-favorite');
+                            heart.css('color', ''); // رنگ پیش‌فرض
+                        }
+                    },
+                    error: function() {
+                        alert('خطا در حذف از علاقه‌مندی‌ها');
+                    }
+                });
+            } else {
+                // اگر علاقه‌مندی نبوده، اضافه شود
+                $.ajax({
+                    url: '/add_favorite/' + recipeId,
+                    method: 'POST',
+                    data: {
+                        title: title,
+                        image: image
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            heart.removeClass('not-favorite').addClass('favorite');
+                            heart.css('color', 'red');
+                        }
+                    },
+                    error: function() {
+                        alert('خطا در افزودن به علاقه‌مندی‌ها');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جستجوی دستور پخت</title>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+<nav class="navbar">
+    <div class="nav-container">
+        {% if current_user.is_authenticated %}
+            <div class="user-info">
+                <span class="username">{{ current_user.username }}</span>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('favorites') }}" class="nav-link">
+                    <span class="icon">★</span>
+                    <span class="text">محبوب‌ها</span>
+                </a>
+                <a href="{{ url_for('view_history') }}" class="nav-link">
+                    <span class="icon">🕒</span>
+                    <span class="text">سابقه</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link logout">
+                    <span class="icon">🚪</span>
+                    <span class="text">خروج</span>
+                </a>
+            </div>
+        {% else %}
+            <!-- حالت کاربر لاگین نکرده -->
+            <div class="auth-links centered">
+                <a href="{{ url_for('login') }}" class="nav-link register">
+                    <span class="text">ورود</span>
+                </a>
+                <a href="{{ url_for('register') }}" class="nav-link register">
+                    <span class="text">ثبت‌نام</span>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</nav>
+
+        <h1>🔎 جستجوی دستور پخت</h1>
+
+<form id="search-form">
+    <input type="text" id="query" name="query" class="fancy-input" placeholder="نام غذا را وارد کنید..." required>
+
+    <select id="diet" name="diet">
+    <option value="">همه رژیم‌ها</option>
+    <option value="vegetarian">گیاه‌خواری</option>
+    <option value="vegan">وگان</option>
+    <option value="gluten free">بدون گلوتن</option>
+    <option value="paleo">پالئو</option>
+    <option value="ketogenic">کتوژنیک</option>
+  </select>
+
+  <button type="submit">جستجو</button>
+</form>
+
+<div id="results"></div>
+
+
+    </div>
+
+
+<script>
+document.getElementById("search-form").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const query = document.getElementById("query").value.trim();
+  const diet = document.getElementById("diet").value;
+
+  const params = new URLSearchParams({
+    query: query,
+    diet: diet
+  });
+
+  fetch(`/search?${params.toString()}`)
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById("results").innerHTML = html;
+    })
+    .catch(error => {
+      console.error("خطا در درخواست:", error);
+      document.getElementById("results").innerHTML = "مشکلی پیش آمده است.";
+    });
+});
+</script>
+
+</body>
+</html>

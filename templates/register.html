@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت‌نام</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://unpkg.com/htmx.org@1.9.0"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>ثبت‌نام</h2>
+        <form method="POST" hx-post="{{ url_for('register') }}" hx-target="#register-message">
+            <input type="text" name="username" placeholder="نام کاربری" required>
+            <input type="email" name="email" placeholder="ایمیل" required>
+            <input type="password" name="password" placeholder="رمز عبور" required>
+            <button type="submit">ثبت‌نام</button>
+        </form>
+
+        <div id="register-message"></div>
+
+        <p>قبلاً حساب کاربری دارید؟ <a href="{{ url_for('login') }}">وارد شوید</a></p>
+    </div>
+
+    <script>
+        document.body.addEventListener("htmx:afterRequest", function(event) {
+            if (event.detail.xhr.status === 200) {
+                let response = JSON.parse(event.detail.xhr.responseText);
+                if (response.redirect) {
+                    window.location.href = response.redirect;
+                }
+            } else if (event.detail.xhr.status === 400) {
+                document.getElementById("register-message").innerHTML = '<p style="color: red;">' + event.detail.xhr.responseText + '</p>';
+            }
+        });
+    </script>
+
+<script>
+    window.addEventListener("pageshow", function(event) {
+        document.getElementById("register-message").innerHTML = "";
+    });
+</script>
+
+</body>
+</html>

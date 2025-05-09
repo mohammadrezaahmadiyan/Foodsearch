@@ -1,0 +1,26 @@
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% elif recipes %}
+    <div class="recipe-grid">
+        {% for recipe in recipes %}
+            <div class="recipe-card">
+                <img src="{{ recipe.image }}" alt="{{ recipe.title }}">
+                <h3>{{ recipe.title }}</h3>
+                <a href="{{ url_for('get_recipe_details', recipe_id=recipe.id) }}" class="btn">
+                    مشاهده دستور پخت
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="no-results">نتیجه‌ای یافت نشد! 🍽️</p>
+{% endif %}
+
+
+<script>
+    function loadRecipeDetails(recipeId) {
+        fetch(`/recipe/${recipeId}`)
+            .then(response => response.text())
+            .then(html => document.getElementById("recipe-details").innerHTML = html);
+    }
+</script>
